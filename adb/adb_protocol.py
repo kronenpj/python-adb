@@ -185,6 +185,8 @@ class AdbMessage(object):
   def CalculateChecksum(data):
     # The checksum is just a sum of all the bytes. I swear.
     if isinstance(data, bytes):
+        return sum(data) & 0xFFFFFFFF
+    if isinstance(data, bytes):
         return sum(map(ord, data.decode('ascii'))) & 0xFFFFFFFF
     return sum(map(ord, data)) & 0xFFFFFFFF
 
@@ -398,4 +400,6 @@ class AdbMessage(object):
     connection = cls.Open(usb, destination='%s:%s' % (service, command),
                           timeout_ms=timeout_ms)
     for data in connection.ReadUntilClose():
-      yield data
+        if isinstance(data, bytearray):
+            data = str(data)
+        yield data
